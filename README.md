@@ -1,4 +1,3 @@
 ﻿# Landing page coaching - Pham Bich Ngoc
-Trang landing page coaching 1:1.
 
-Test auto-deploy: 2026-07-03T22:44:50
+Trang landing page coaching 1:1 cho phu nu 35-45. Deploy tren Vercel, tu dong cap nhat khi push len GitHub.
