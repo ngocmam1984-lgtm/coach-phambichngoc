@@ -762,7 +762,11 @@
     });
   });
 
-  // Xử lý form đăng ký
+  // Cấu hình Supabase (anon/publishable key — an toàn để công khai)
+  var SUPABASE_URL = 'https://uswfhecalxkwjxfowupc.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_5BYqT1aZVChJQApY8rgjlQ_6ULpbPIc';
+
+  // Xử lý form đăng ký — lưu vào Supabase
   var form = document.getElementById('dangKyForm');
   form.addEventListener('submit', function(e){
     e.preventDefault();
@@ -770,12 +774,41 @@
       form.reportValidity();
       return;
     }
-    // TODO: kết nối tới backend/email/Google Form của bạn để nhận dữ liệu.
-    var success = document.getElementById('formSuccess');
-    success.style.display = 'block';
-    form.querySelector('button[type="submit"]').textContent = 'Đã gửi đăng ký';
-    success.scrollIntoView({behavior:'smooth', block:'center'});
-    form.reset();
+    var btn = form.querySelector('button[type="submit"]');
+    var originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Đang gửi...';
+
+    var payload = {
+      ho_ten: document.getElementById('name').value.trim(),
+      so_dien_thoai: document.getElementById('phone').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      goi: document.getElementById('package').value || null,
+      loi_nhan: document.getElementById('message').value.trim() || null
+    };
+
+    fetch(SUPABASE_URL + '/rest/v1/dang_ky', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    }).then(function(res){
+      if(!res.ok){ return res.text().then(function(t){ throw new Error(t || ('HTTP ' + res.status)); }); }
+      var success = document.getElementById('formSuccess');
+      success.style.display = 'block';
+      btn.textContent = 'Đã gửi đăng ký';
+      success.scrollIntoView({behavior:'smooth', block:'center'});
+      form.reset();
+    }).catch(function(err){
+      btn.disabled = false;
+      btn.textContent = originalText;
+      alert('Xin lỗi, gửi đăng ký chưa thành công. Vui lòng thử lại, hoặc liên hệ trực tiếp qua Zalo 0395478786.');
+      console.error('Supabase error:', err);
+    });
   });
 </script>
 </body>
